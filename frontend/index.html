@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stock Management System - Dashboard</title>
+  
+  <!-- IMMEDIATE AUTH CHECK - RUNS BEFORE ANYTHING RENDERS -->
+  <script>
+    (function() {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = 'login.html';
+      }
+    })();
+  </script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1a2332 50%, #2d3e5f 100%);
+      color: #f1f5f9;
+      overflow-x: hidden;
+    }
+
+    body {
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .header-content h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #2563eb 0%, #60a5fa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 5px;
+    }
+
+    .header-content p {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+    }
+
+    .logout-btn {
+      background: linear-gradient(135deg, #ef4444 0%, #b02a37 100%);
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+
+    .logout-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 968px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 30px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      animation: slideUp 0.5s ease;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card:hover {
+      border-color: #2563eb;
+      box-shadow: 0 12px 40px rgba(37, 99, 235, 0.15);
+    }
+
+    .form-section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 25px;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-section h2::before {
+      content: '➕';
+      font-size: 1.8rem;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(51, 65, 85, 0.5);
+      border: 1.5px solid #334155;
+      border-radius: 10px;
+      color: #f1f5f9;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #2563eb;
+      background: rgba(51, 65, 85, 0.8);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    input::placeholder {
+      color: rgba(203, 213, 225, 0.5);
+    }
+
+    .form-section button[type="submit"] {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 10px;
+    }
+
+    .form-section button[type="submit"]:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+    }
+
+    .form-section button[type="submit"]:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    #message {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+      text-align: center;
+      font-size: 0.9rem;
+      display: none;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    #message.alert-success {
+      display: block;
+      color: #86efac;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    #message.alert-danger {
+      display: block;
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .stats-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .stat-card {
+      background: rgba(37, 99, 235, 0.1);
+      border: 1px solid rgba(37, 99, 235, 0.2);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      border-color: #2563eb;
+      background: rgba(37, 99, 235, 0.15);
+    }
+
+    .stat-value {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: #2563eb;
+      margin-bottom: 5px;
+      word-break: break-word;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .history-link {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #334155;
+    }
+
+    .history-link a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .history-link a:hover {
+      color: #60a5fa;
+      transform: translateX(4px);
+    }
+
+    .table-section {
+      grid-column: 1 / -1;
+    }
+
+    .table-section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 25px;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .table-section h2::before {
+      content: '📊';
+      font-size: 1.8rem;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid #334155;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: rgba(37, 99, 235, 0.15);
+      border-bottom: 2px solid #2563eb;
+    }
+
+    th {
+      padding: 16px;
+      text-align: left;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #f1f5f9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #334155;
+      font-size: 0.95rem;
+    }
+
+    tbody tr {
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(37, 99, 235, 0.08);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .update-btn {
+      background: #10b981;
+      color: white;
+    }
+
+    .update-btn:hover {
+      background: #059669;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .delete-btn {
+      background: #ef4444;
+      color: white;
+    }
+
+    .delete-btn:hover {
+      background: #dc2626;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      color: #cbd5e1;
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 15px;
+    }
+
+    .empty-state p {
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 768px) {
+      .header-content h1 {
+        font-size: 1.8rem;
+      }
+
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-section {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 0.85rem;
+      }
+
+      th, td {
+        padding: 12px 8px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .btn {
+        width: 100%;
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-section">
+      <div class="header-content">
+        <h1>📦 Stock Management System</h1>
+        <p>Manage your inventory efficiently and effectively</p>
+      </div>
+      <button id="logoutBtn" class="logout-btn">🚪 Logout</button>
+    </div>
+
+    <div class="content-grid">
+      <div class="card form-section">
+        <h2>Add New Item</h2>
+        
+        <form id="itemForm">
+          <div class="form-group">
+            <label for="name">Item Name</label>
+            <input 
+              type="text" 
+              id="name" 
+              placeholder="e.g., Laptop, Monitor" 
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="category">Category</label>
+            <input 
+              type="text" 
+              id="category" 
+              placeholder="e.g., Electronics, Furniture" 
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <input 
+              type="number" 
+              id="quantity" 
+              placeholder="e.g., 50" 
+              min="0" 
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="price">Price (PKR per unit)</label>
+            <input 
+              type="number" 
+              id="price" 
+              placeholder="e.g., 50000" 
+              step="1" 
+              min="0" 
+              required
+            />
+          </div>
+
+          <button type="submit">Add Item</button>
+        </form>
+
+        <div id="message"></div>
+
+        <div class="history-link">
+          <a href="product-history.html">📜 View Product History</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 style="border: none; padding: 0; margin: 0 0 20px 0; font-size: 1.5rem;">Quick Stats</h2>
+        <div class="stats-section">
+          <div class="stat-card">
+            <div class="stat-value" id="totalItems">0</div>
+            <div class="stat-label">Total Items</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="totalValue">PKR 0</div>
+            <div class="stat-label">Total Value</div>
+          </div>
+        </div>
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #334155;">
+          <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Latest Additions:</p>
+          <div id="recentItems" style="color: #2563eb; font-size: 0.95rem; line-height: 1.8;">
+            <div style="font-size: 1.5rem; margin: 10px 0;">No items yet</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card table-section">
+      <h2>Added Items</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Category</th>
+              <th>Quantity</th>
+              <th>Price (PKR)</th>
+              <th>Total Value (PKR)</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="itemsTableBody">
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 50px;">
+                <div class="empty-state">
+                  <div class="empty-state-icon">📭</div>
+                  <p>No items added yet. Start by adding your first item!</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==================== INITIALIZATION ====================
+    let currentEditId = null;
+
+    const token = localStorage.getItem('token');
+    const form = document.getElementById('itemForm');
+    const messageBox = document.getElementById('message');
+    const itemsTableBody = document.getElementById('itemsTableBody');
+
+    // ==================== UTILITY FUNCTIONS ====================
+    function formatPKR(amount) {
+      return new Intl.NumberFormat('en-PK', {
+        style: 'currency',
+        currency: 'PKR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(amount);
+    }
+
+    function showMessage(text, type = 'success') {
+      messageBox.textContent = text;
+      messageBox.className = type === 'success' ? 'alert-success' : 'alert-danger';
+      setTimeout(() => {
+        messageBox.textContent = '';
+        messageBox.className = '';
+      }, 4000);
+    }
+
+    async function authFetch(url, options = {}) {
+      try {
+        const headers = {
+          'Authorization': `Bearer ${token}`,
+          ...options.headers
+        };
+
+        const response = await fetch(url, {
+          ...options,
+          headers
+        });
+
+        if (response.status === 401 || response.status === 403) {
+          localStorage.removeItem('token');
+          window.location.href = 'login.html';
+          return null;
+        }
+
+        return response;
+      } catch (error) {
+        console.error('Fetch error:', error);
+        throw error;
+      }
+    }
+
+    // ==================== FORM SUBMISSION ====================
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = {
+        name: document.getElementById('name').value.trim(),
+        category: document.getElementById('category').value.trim(),
+        quantity: parseInt(document.getElementById('quantity').value),
+        price: parseInt(document.getElementById('price').value)
+      };
+
+      if (!formData.name || !formData.category || !formData.quantity || !formData.price) {
+        showMessage('All fields are required', 'danger');
+        return;
+      }
+
+      if (formData.quantity < 0 || formData.price < 0) {
+        showMessage('Quantity and price must be positive', 'danger');
+        return;
+      }
+
+      try {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = currentEditId ? 'Updating...' : 'Adding...';
+
+        let response;
+        if (currentEditId) {
+          console.log('Updating item:', currentEditId);
+          response = await authFetch(`/api/items/${currentEditId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+          });
+        } else {
+          console.log('Adding new item');
+          response = await authFetch('/api/items', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+          });
+        }
+
+        if (!response) {
+          throw new Error('No response from server');
+        }
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          showMessage(errorData.message || 'Error saving item', 'danger');
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+          return;
+        }
+
+        const data = await response.json();
+        const successMsg = currentEditId ? '✓ Item updated successfully!' : '✓ Item added successfully!';
+        showMessage(successMsg, 'success');
+        form.reset();
+        currentEditId = null;
+        submitBtn.textContent = 'Add Item';
+        submitBtn.disabled = false;
+        loadItems();
+      } catch (error) {
+        showMessage('Error connecting to server. Please try again.', 'danger');
+        console.error('Error:', error);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = false;
+        submitBtn.textContent = currentEditId ? 'Update Item' : 'Add Item';
+      }
+    });
+
+    // ==================== LOAD ITEMS ====================
+    async function loadItems() {
+      try {
+        const response = await authFetch('/api/items');
+
+        if (!response) {
+          throw new Error('No response from server');
+        }
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error('Error response:', errorData);
+          showMessage(errorData.message || 'Error loading items', 'danger');
+          return;
+        }
+
+        const items = await response.json();
+
+        if (!items || items.length === 0) {
+          itemsTableBody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 50px;">
+                <div class="empty-state">
+                  <div class="empty-state-icon">📭</div>
+                  <p>No items added yet. Start by adding your first item!</p>
+                </div>
+              </td>
+            </tr>
+          `;
+          updateStats([]);
+          return;
+        }
+
+        itemsTableBody.innerHTML = items.map(item => {
+          const totalValue = item.quantity * item.price;
+          return `
+            <tr>
+              <td><strong>${item.name}</strong></td>
+              <td>${item.category}</td>
+              <td>${item.quantity}</td>
+              <td>${formatPKR(item.price)}</td>
+              <td>${formatPKR(totalValue)}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn update-btn" onclick="editItem('${item._id}')">✏️ Update</button>
+                  <button class="btn delete-btn" onclick="deleteItem('${item._id}')">🗑️ Delete</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        updateStats(items);
+      } catch (error) {
+        console.error('Error loading items:', error);
+        showMessage('Error loading items. Please refresh the page.', 'danger');
+      }
+    }
+
+    // ==================== UPDATE STATS ====================
+    function updateStats(items) {
+      const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+      const totalValue = items.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+
+      document.getElementById('totalItems').textContent = totalQuantity;
+      document.getElementById('totalValue').textContent = formatPKR(totalValue);
+
+      const recent = items.slice(-3).reverse();
+      const recentHtml = recent.length > 0
+        ? recent.map(item => `<div>• <strong>${item.name}</strong> (${item.quantity} units)</div>`).join('')
+        : '<div style="font-size: 1.5rem; margin: 10px 0;">No items yet</div>';
+      document.getElementById('recentItems').innerHTML = recentHtml;
+    }
+
+    // ==================== EDIT ITEM ====================
+    async function editItem(id) {
+      try {
+        const response = await authFetch(`/api/items/${id}`);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          showMessage(errorData.message || 'Error loading item', 'danger');
+          console.error('Response error:', errorData);
+          return;
+        }
+
+        const item = await response.json();
+
+        if (!item || !item._id) {
+          showMessage('Invalid item data received', 'danger');
+          return;
+        }
+
+        document.getElementById('name').value = item.name || '';
+        document.getElementById('category').value = item.category || '';
+        document.getElementById('quantity').value = item.quantity || 0;
+        document.getElementById('price').value = item.price || 0;
+
+        currentEditId = id;
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.textContent = 'Update Item';
+
+        document.getElementById('name').focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        showMessage('Item loaded for editing', 'success');
+      } catch (error) {
+        showMessage('Error loading item. Please try again.', 'danger');
+        console.error('Error:', error);
+      }
+    }
+
+    // ==================== DELETE ITEM ====================
+    async function deleteItem(id) {
+      if (!confirm('Are you sure you want to delete this item?')) return;
+
+      try {
+        const response = await authFetch(`/api/items/${id}`, { method: 'DELETE' });
+
+        if (!response) {
+          throw new Error('No response from server');
+        }
+
+        if (response.ok) {
+          showMessage('✓ Item deleted successfully!', 'success');
+          loadItems();
+        } else {
+          const data = await response.json();
+          showMessage(data.message || 'Error deleting item', 'danger');
+        }
+      } catch (error) {
+        showMessage('Error connecting to server', 'danger');
+        console.error('Error:', error);
+      }
+    }
+
+    // ==================== LOGOUT ====================
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to logout?')) {
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';
+      }
+    });
+
+    // ==================== PAGE LOAD ====================
+    window.addEventListener('load', () => {
+      loadItems();
+    });
+  </script>
+</body>
+</html>
