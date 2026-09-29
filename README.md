@@ -1,237 +1,117 @@
 <div align="center">
 
-# 📦 Stock Management System
+# Stock Management System
 
-### _A Modern, Secure, and Efficient Inventory Tracker_
+### _A full-stack inventory tracker with JWT auth and a change-history log_
 
-[![Node.js](https://img.shields.io/badge/Node.js-18.x-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Express.js](https://img.shields.io/badge/Express.js-4.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![JWT](https://img.shields.io/badge/Auth-JWT-black?style=for-the-badge&logo=JSON%20web%20tokens)](https://jwt.io/)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](#-license)
-
-<br/>
-
-```
-    ╔══════════════════════════════════════════════════════╗
-    ║                                                      ║
-    ║        ███████╗████████╗ ██████╗  ██████╗██╗  ██╗    ║
-    ║        ██╔════╝╚══██╔══╝██╔═══██╗██╔════╝██║ ██╔╝    ║
-    ║        ███████╗   ██║   ██║   ██║██║     █████╔╝     ║
-    ║        ╚════██║   ██║   ██║   ██║██║     ██╔═██╗     ║
-    ║        ███████║   ██║   ╚██████╔╝╚██████╗██║  ██╗    ║
-    ║        ╚══════╝   ╚═╝    ╚═════╝  ╚═════╝╚═╝  ╚═╝    ║
-    ║                                                      ║
-    ║           Track your inventory seamlessly.           ║
-    ╚══════════════════════════════════════════════════════╝
-```
-
-<br/>
-
-> 🏢 A **full-stack web application** designed to simplify inventory tracking. Built with **Node.js, Express, and MongoDB**, it features a secure JWT-based authentication system, real-time stock updates, and a responsive glassmorphism UI for an exceptional user experience.
-
----
-
-[Features](#-features) •
-[Architecture](#-system-architecture) •
-[Tech Stack](#-tech-stack) •
-[API Endpoints](#-api-reference) •
-[Setup](#-quick-start) •
-[Project Structure](#-project-structure)
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![JWT](https://img.shields.io/badge/Auth-JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
 </div>
 
 ---
+
+A **full-stack inventory app** — log in, add products with category, quantity and price (shown in PKR), update or delete them, and watch every change get recorded in a product-history log. The frontend is served by the same Express app that powers the API.
 
 ## ✨ Features
 
-<table>
-<tr>
-<td width="50%">
+- **JWT authentication** — login issues a 24-hour token; every `/api/items` and `/api/history` route is guarded by token verification.
+- **Full inventory CRUD** — add items with name, category, quantity and price; edit stock levels; delete items. Non-negative quantities/prices enforced on the server.
+- **Product history log** — every add, update and delete writes a history entry, viewable on a dedicated history page (latest 100, newest first).
+- **Dashboard with live stats** — total items and total stock value at a glance, updating as items change.
+- **Login-gated frontend** — vanilla-JS dashboard, login page, and history page served straight from Express; protected pages redirect to login without a valid token.
+- **Security helpers included** — middleware for Helmet-style headers, rate limiting, and CORS options live in `backend/middleware/`, plus a structured error handler.
 
-### 🔐 Secure Authentication
-- **JWT-based login** system
-- Protected API routes
-- Immediate client-side auth checks
-- Secure HTTP headers with **Helmet**
-
-### 📦 Inventory Management
-- **Add new products** with details (name, quantity, price)
-- **Update stock levels** in real-time
-- **Delete items** from inventory
-- Automatic timestamping of changes
-
-</td>
-<td width="50%">
-
-### 📊 Dashboard & History
-- View all current stock in a clean grid
-- **Product History tracking**: monitor stock changes over time
-- Real-time UI updates upon modifications
-- Responsive design for desktop and mobile
-
-### 🎨 Premium UI/UX
-- **Glassmorphism** aesthetic with deep dark themes
-- Smooth CSS animations and transitions
-- Modern gradient accents and typography
-- Clean, intuitive dashboard layout
-
-</td>
-</tr>
-</table>
-
----
-
-## 🏗️ System Architecture
-
-```mermaid
-flowchart TD
-    subgraph Frontend [🎨 Client (Vanilla JS + HTML/CSS)]
-        A[Login Page] -->|Auth| B(Dashboard)
-        B --> C{API Calls}
-        D[History Page] --> C
-    end
-
-    subgraph Backend [⚙️ Server (Node.js + Express)]
-        C -->|HTTP REST| E[Express Router]
-        E -->|JWT Verification| F[Auth Middleware]
-        F --> G[Controllers]
-    end
-
-    subgraph Database [🗄️ MongoDB]
-        G -->|Mongoose ODM| H[(MongoDB Atlas / Local)]
-        H -.->|JSON Data| G
-    end
-```
-
----
+> Demo credentials baked in for testing: username `DB`, password `0702`.
 
 ## 🛠️ Tech Stack
 
-<div align="center">
-
-| Layer | Technology | Purpose |
-|:---|:---|:---|
-| 🎨 **Frontend** | HTML5, CSS3, Vanilla JS | Responsive, modern user interface |
-| ⚙️ **Backend** | Node.js, Express.js | RESTful API server |
-| 🗄️ **Database** | MongoDB (Mongoose) | NoSQL document storage |
-| 🔐 **Security** | JWT, Helmet, CORS | Authentication and API protection |
-| 🔧 **Config** | dotenv | Environment variable management |
-
-</div>
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-| Requirement | Why |
+| Layer | Technology |
 |:---|:---|
-| **Node.js 18+** | JavaScript runtime for the backend |
-| **MongoDB** | Database (Local instance or MongoDB Atlas cluster) |
+| Backend | Node.js, Express.js 5 |
+| Database | MongoDB + Mongoose ODM |
+| Auth | JSON Web Tokens (24h expiry) |
+| Config | dotenv (`.env` in `backend/`) |
+| Security deps | Helmet, CORS, express-rate-limit, bcryptjs |
+| Frontend | HTML5, CSS3, vanilla JavaScript — served by Express |
 
-### Installation
+## 🚀 Getting Started
 
-**1. Clone the repository**
+**Prerequisites:** Node.js 18+ and MongoDB (a local instance or a MongoDB Atlas cluster).
+
 ```bash
+# 1. Clone
 git clone https://github.com/hussnainahmedd/stock-management-system.git
 cd stock-management-system
-```
 
-**2. Install dependencies**
-```bash
+# 2. Install backend dependencies
 cd backend
 npm install
+
+# 3. Configure
+#    Create backend/.env with:
+#    PORT=5000
+#    MONGODB_URI=mongodb://localhost:27017/stock_management
+#    SECRET_KEY=your_super_secret_jwt_key
+
+# 4. Run
+node app.js        # or: npm run dev (nodemon)
 ```
 
-**3. Configure Environment Variables**
-
-Create a `.env` file in the `backend` directory:
-```env
-PORT=3000
-MONGODB_URI=mongodb://localhost:27017/stock_management
-SECRET_KEY=your_super_secret_jwt_key
-```
-
-**4. Start the server**
-```bash
-node app.js
-```
-
-**5. Open your browser** → **http://localhost:3000** 🎉
-
-> [!NOTE]
-> The default login credentials (for testing) are defined in `app.js`:
-> - **Username:** `DB`
-> - **Password:** `0702`
-
----
+Open **http://localhost:5000** — you'll land on the login page. Sign in with the demo credentials (`DB` / `0702`) and start adding stock.
 
 ## 📡 API Reference
 
-All protected routes require a valid JWT token in the `Authorization` header: `Bearer <token>`.
+Public:
 
-| Method | Endpoint | Protection | Description |
-|:---:|:---|:---:|:---|
-| `POST` | `/api/login` | 🔓 Public | Authenticate user and return JWT |
-| `GET` | `/api/items` | 🔒 Private | Retrieve all inventory items |
-| `POST` | `/api/items` | 🔒 Private | Add a new item to inventory |
-| `PUT` | `/api/items/:id` | 🔒 Private | Update an existing item |
-| `DELETE` | `/api/items/:id` | 🔒 Private | Delete an item from inventory |
+| Method | Endpoint | Description |
+|:---:|:---|:---|
+| `POST` | `/api/login` | Authenticate with username/password, returns a JWT |
 
----
+Protected (send `Authorization: Bearer <token>`):
 
-## 📂 Project Structure
+| Method | Endpoint | Description |
+|:---:|:---|:---|
+| `GET` | `/api/items` | List all items (newest first) |
+| `GET` | `/api/items/:id` | Get one item |
+| `POST` | `/api/items` | Add an item (`name`, `category`, `quantity`, `price`) |
+| `PUT` | `/api/items/:id` | Update an item |
+| `DELETE` | `/api/items/:id` | Delete an item (logged in history) |
+| `GET` | `/api/history` | Last 100 stock changes, newest first |
+
+## 📁 Project Structure
 
 ```
 stock-management-system/
-│
-├── package.json               # Root package config
-├── package-lock.json          
-│
-├── backend/                   # ⚙️ Server-side code
-│   ├── app.js                 # Express app setup & API routes
-│   ├── package.json           # Backend dependencies
-│   ├── config/                # Database configuration
-│   │   └── db.js              # MongoDB connection logic
-│   ├── controllers/           # Route handler logic (if separated)
-│   ├── middleware/            # Custom middleware
-│   │   └── auth.js            # JWT verification middleware
-│   └── models/                # Mongoose schemas
-│       ├── Item.js            # Inventory item schema
-│       └── history.js         # Stock change history schema
-│
-└── frontend/                  # 🎨 Client-side code (served by Express)
-    ├── index.html             # Main dashboard (requires auth)
-    ├── login.html             # Login page
-    └── product-history.html   # Historical tracking view
+├── backend/
+│   ├── app.js                  # Express app: JWT auth + inline API routes
+│   ├── config/db.js            # MongoDB connection
+│   ├── models/
+│   │   ├── Item.js             # Item schema (name, category, quantity, price)
+│   │   ├── history.js          # History schema (action, item snapshot, timestamp)
+│   │   └── user.js             # User schema (bcrypt-hashed password)
+│   ├── middleware/
+│   │   ├── security.js         # Helmet headers, rate limiter, CORS options
+│   │   └── errorHandler.js     # Structured error responses
+│   └── controllers/
+│       └── itemController.js   # Controller stub (route handlers live in app.js)
+└── frontend/
+    ├── login.html              # Login page
+    ├── index.html              # Dashboard (stats, items grid, add/edit/delete)
+    └── product-history.html    # Change-history view
 ```
 
----
+## 👀 Preview
 
-## 🤝 Contributing
-
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **Commit** your changes (`git commit -m '✨ Add amazing feature'`)
-4. **Push** to the branch (`git push origin feature/amazing-feature`)
-5. **Open** a Pull Request
-
----
-
-## 📜 License
-
-This project is open source and available under the [MIT License](LICENSE).
+![Stock Management System preview](assets/hero.webp)
 
 ---
 
 <div align="center">
 
-**⭐ Star this repo if you found it useful!**
-
-<br/>
-
-Built with 💻 Node.js · 🍃 MongoDB · 🔒 JWT
+Built by **[Hussnain Ahmad](https://github.com/hussnainahmedd)** — learning by building, one system at a time.
 
 </div>
